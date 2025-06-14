@@ -1,5 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import './App.css'
+import React from 'react';
+
+
+
+function PoliticiCard({ politico }) {
+  return (
+    <li>
+      <h3>{politico.name}</h3>
+      <img src={politico.image} alt="img rotta" />
+      <p>{politico.position}</p>
+      <p>{politico.biography}</p>
+    </li>
+  )
+}
+const PoliticiMemo = React.memo(PoliticiCard);
+
+
 
 function App() {
   const [politici, setPolitici] = useState([]);
@@ -11,10 +28,13 @@ function App() {
       .then(data => { setPolitici(data) });
   }, []);
 
-  const filtroPolitici = politici.filter(politico =>
-    politico.name.toLowerCase().includes(cerca.toLowerCase()) ||
-    politico.biography.toLowerCase().includes(cerca.toLowerCase())
-  );
+  const filtroPolitici = useMemo(() => {
+    return politici.filter(politico =>
+      politico.name.toLowerCase().includes(cerca.toLowerCase()) ||
+      politico.biography.toLowerCase().includes(cerca.toLowerCase())
+    );
+  }, [politici, cerca]);
+
 
   return (
     <>
@@ -26,12 +46,7 @@ function App() {
       />
       <ul>
         {filtroPolitici.map(politico => (
-          <li key={politico.id}>
-            <h3>{politico.name}</h3>
-            <img src={politico.image} alt="img rotta" />
-            <p>{politico.position}</p>
-            <p>{politico.biography}</p>
-          </li>
+          <PoliticiMemo key={politico.id} politico={politico} />
         ))}
       </ul>
     </>
